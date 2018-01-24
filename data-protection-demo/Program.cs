@@ -1,12 +1,27 @@
 ﻿using System;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace data_protection_demo
+public class Program
 {
-    class Program
+    public static void Main(string[] args)
     {
-        static void Main(string[] args)
+        var services = new ServiceCollection()
+            .AddDataProtection()
+            .Services.BuildServiceProvider();
+
+        var protecterProvider = services.GetService<IDataProtectionProvider>();
+        var protector = protecterProvider.CreateProtector("AwesomePurpose");
+
+        while (true)
         {
-            Console.WriteLine("Hello World!");
+            Console.Write($"Type something sensitive: ");
+            var input = Console.ReadLine();
+            var protectedInput = protector.Protect(input);
+            Console.WriteLine($"Protected: {protectedInput}");
+            var unprotectedInput = protector.Unprotect(protectedInput);
+            Console.WriteLine($"Unprotected: {unprotectedInput}");
+            Console.WriteLine();
         }
     }
 }
